@@ -1,9 +1,9 @@
 """
-Planner — converts a natural-language question into a QuerySpec.
+Planner -- converts a natural-language question into a QuerySpec.
 
 Two modes:
-  mock     → deterministic keyword extraction (no API key needed, great for tests)
-  openai / anthropic → LLM-backed parsing via llm_client
+  mock     -> deterministic keyword extraction (no API key needed, great for tests)
+  openai / anthropic -> LLM-backed parsing via llm_client
 """
 from __future__ import annotations
 
@@ -17,7 +17,6 @@ from src.core.logging import get_logger
 
 logger = get_logger(__name__)
 
-# ── Keyword maps for mock mode ───────────────────────────
 
 _METRIC_KEYWORDS: dict[str, list[str]] = {
     "revenue":              ["revenue", "sales", "money", "income", "earned"],
@@ -56,7 +55,6 @@ _TIME_RANGE_PATTERNS: list[tuple[str, str]] = [
     (r"ytd|year\s*to\s*date",   "year to date"),
 ]
 
-# ── Filter extraction helpers ────────────────────────────
 
 # "in US", "in India", "for US", "where country is US"
 _FILTER_COUNTRY_RE = re.compile(
@@ -100,10 +98,9 @@ def _extract_filters(question: str) -> dict[str, list[str]]:
     return filters
 
 
-# ── Mock planner ─────────────────────────────────────────
 
 def _plan_mock(question: str, model: SemanticModel) -> QuerySpec:
-    """Deterministic keyword-based NL→QuerySpec parser."""
+    """Deterministic keyword-based NL->QuerySpec parser."""
     q = question.lower().strip()
 
     # 1. Detect metric (first match wins; most specific keywords first)
@@ -169,18 +166,17 @@ def _plan_mock(question: str, model: SemanticModel) -> QuerySpec:
     )
 
 
-# ── LLM planner ─────────────────────────────────────────
 
 _LLM_SYSTEM_PROMPT = """\
 You are a semantic-layer query planner. Given a natural-language business question, \
 extract a JSON object with these exact fields:
 
-  metric       : string  — one of: {metrics}
-  dimensions   : list[string] — zero or more of: {dimensions}
-  filters      : dict[string, list[string]] — dimension name → allowed values
-  time_grain   : string | null — one of: day, week, month (or null)
-  time_range   : string | null — e.g. "last 6 months" (or null)
-  limit        : int — max rows, default {max_rows}, max {max_rows}
+  metric       : string  -- one of: {metrics}
+  dimensions   : list[string] -- zero or more of: {dimensions}
+  filters      : dict[string, list[string]] -- dimension name -> allowed values
+  time_grain   : string | null -- one of: day, week, month (or null)
+  time_range   : string | null -- e.g. "last 6 months" (or null)
+  limit        : int -- max rows, default {max_rows}, max {max_rows}
 
 Respond ONLY with valid JSON. No markdown, no explanation."""
 
@@ -231,15 +227,14 @@ def _plan_llm(question: str, model: SemanticModel) -> QuerySpec:
     return _parse_llm_response(response, model)
 
 
-# ── Public API ───────────────────────────────────────────
 
 def plan(question: str, mode: str = "mock") -> QuerySpec:
     """Parse *question* into a QuerySpec.
 
     Modes
     -----
-    mock              — rule-based keyword extraction (no API key needed)
-    openai / anthropic — LLM-backed parsing via llm_client
+    mock              -- rule-based keyword extraction (no API key needed)
+    openai / anthropic -- LLM-backed parsing via llm_client
     """
     model = load_semantic_model()
 

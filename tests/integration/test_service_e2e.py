@@ -1,7 +1,7 @@
 """
-Integration tests — full service pipeline with live SQL execution.
+Integration tests -- full service pipeline with live SQL execution.
 
-Tests the complete ask() flow end-to-end: NL → Spec → SQL → Execute → Rows.
+Tests the complete ask() flow end-to-end: NL -> Spec -> SQL -> Execute -> Rows.
 Requires live Postgres with dbt mart tables populated.
 """
 from __future__ import annotations
@@ -9,7 +9,6 @@ from __future__ import annotations
 import pytest
 from sqlalchemy import text
 
-# ── Guard: skip if DB is unreachable ─────────────────────
 try:
     from src.db.connection import get_engine
 
@@ -25,7 +24,6 @@ pytestmark = pytest.mark.skipif(not DB_AVAILABLE, reason="Postgres not reachable
 from src.copilot.service import ask, CopilotResult
 
 
-# ── End-to-end with execute=True ─────────────────────────
 
 def test_ask_returns_real_rows():
     result = ask("Revenue by country last 6 months", execute=True)
@@ -57,7 +55,7 @@ def test_execute_false_returns_no_rows():
 def test_orders_by_month():
     result = ask("Orders by month last 30 days", execute=True)
     assert result.success is True
-    # Seed data may not have orders in recent 30 days either —
+    # Seed data may not have orders in recent 30 days either --
     # just verify the pipeline completes without error
     assert isinstance(result.rows, list)
 

@@ -1,5 +1,5 @@
 """
-Unit tests — copilot service: end-to-end mock pipeline.
+Unit tests -- copilot service: end-to-end mock pipeline.
 Uses execute=False so no DB connection is needed.
 """
 from src.copilot.service import ask, CopilotResult

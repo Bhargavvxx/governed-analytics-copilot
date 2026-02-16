@@ -1,5 +1,5 @@
 """
-API tests — FastAPI endpoints via TestClient (no live server needed).
+API tests -- FastAPI endpoints via TestClient (no live server needed).
 """
 import pytest
 from fastapi.testclient import TestClient
@@ -9,7 +9,6 @@ from src.api.main import app
 client = TestClient(app)
 
 
-# ── Health ───────────────────────────────────────────────
 
 def test_health():
     resp = client.get("/health")
@@ -17,7 +16,6 @@ def test_health():
     assert resp.json()["status"] == "ok"
 
 
-# ── Catalog (lightweight) ───────────────────────────────
 
 def test_metrics_list():
     resp = client.get("/metrics")
@@ -37,7 +35,6 @@ def test_dimensions_list():
     assert len(data["dimensions"]) == 6
 
 
-# ── Catalog (detailed) ──────────────────────────────────
 
 def test_metrics_detail():
     resp = client.get("/metrics/detail")
@@ -75,7 +72,6 @@ def test_full_catalog():
     assert len(data["allowed_tables"]) == 6
 
 
-# ── POST /ask ────────────────────────────────────────────
 
 def test_ask_basic():
     resp = client.post("/ask", json={"question": "Revenue by country last 6 months", "execute": False})
@@ -132,7 +128,6 @@ def test_ask_empty_body():
     assert resp.status_code == 422
 
 
-# ── POST /ask/explain ────────────────────────────────────
 
 def test_explain_basic():
     resp = client.post("/ask/explain", json={"question": "Revenue by country last 6 months"})
@@ -150,7 +145,6 @@ def test_explain_no_sql_returned():
     assert "sql" not in data  # explain doesn't generate SQL
 
 
-# ── SQL content checks ───────────────────────────────────
 
 def test_generated_sql_has_proper_clauses():
     resp = client.post("/ask", json={"question": "Revenue by category by month last 6 months", "execute": False})
@@ -171,10 +165,9 @@ def test_generated_sql_uses_governed_tables():
     assert "marts_marts." in sql
 
 
-# ── Multiple questions (chat) ────────────────────────────
 
 def test_multiple_asks():
-    """Verify the API is stateless — each call independent."""
+    """Verify the API is stateless -- each call independent."""
     r1 = client.post("/ask", json={"question": "Revenue last 6 months", "execute": False})
     r2 = client.post("/ask", json={"question": "Orders this year", "execute": False})
     assert r1.json()["spec"]["metric"] == "revenue"

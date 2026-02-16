@@ -1,5 +1,5 @@
 """
-Copilot service — orchestrates plan → validate → generate → safety → execute → log.
+Copilot service -- orchestrates plan -> validate -> generate -> safety -> execute -> log.
 
 Full end-to-end pipeline.  When `execute=True` (default), the generated SQL is
 run against Postgres in a READ ONLY transaction and the result rows are returned.
@@ -29,7 +29,6 @@ try:
 except Exception:
     logger.warning("Could not ensure query log table (DB may not be available)")
 
-# ── Input-level adversarial detector ─────────────────────
 _INJECTION_RE = re.compile(
     r"\b(DROP\s+TABLE|ALTER\s+TABLE|TRUNCATE|DELETE\s+FROM|INSERT\s+INTO|"
     r"UPDATE\s+\w+\s+SET|GRANT\s|REVOKE\s|CREATE\s+TABLE|"
@@ -50,9 +49,9 @@ def _check_input_safety(question: str) -> list[str]:
     """Detect SQL injection / adversarial patterns in the raw question."""
     errors: list[str] = []
     if _INJECTION_RE.search(question):
-        errors.append("Question contains potentially dangerous SQL patterns — blocked.")
+        errors.append("Question contains potentially dangerous SQL patterns -- blocked.")
     if _PII_RE.search(question):
-        errors.append("Question requests personally identifiable information — blocked.")
+        errors.append("Question requests personally identifiable information -- blocked.")
     return errors
 
 
@@ -83,14 +82,14 @@ def ask(
     mode: str = "mock",
     execute: bool = True,
 ) -> CopilotResult:
-    """End-to-end: question → structured result.
+    """End-to-end: question -> structured result.
 
     Parameters
     ----------
     question : str
         Natural-language business question.
     mode : str
-        Planner mode — "mock" (keyword), "openai", or "anthropic".
+        Planner mode -- "mock" (keyword), "openai", or "anthropic".
     execute : bool
         If True, run the generated SQL against Postgres.
         If False, return the SQL without executing (dry-run).
@@ -112,7 +111,7 @@ def ask(
             pass
         return CopilotResult(spec=dummy_spec, sql="", rows=[], validation_errors=input_errors, safety_errors=[], latency_ms=latency)
 
-    # 1. Plan: NL → QuerySpec
+    # 1. Plan: NL -> QuerySpec
     spec = plan(question, mode=mode)
 
     # 2. Validate spec against semantic model
@@ -138,7 +137,7 @@ def ask(
 
     latency = int((time.perf_counter() - t0) * 1000)
 
-    # 6. Audit log (fire-and-forget — never block the response)
+    # 6. Audit log (fire-and-forget -- never block the response)
     try:
         log_query(
             question=question,
@@ -151,7 +150,7 @@ def ask(
             latency_ms=latency,
         )
     except Exception:
-        logger.warning("Audit log write failed — continuing")
+        logger.warning("Audit log write failed -- continuing")
 
     return CopilotResult(
         spec=spec,

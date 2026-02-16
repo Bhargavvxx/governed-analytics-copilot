@@ -1,5 +1,5 @@
 """
-SQL Generator — turns a validated QuerySpec into a governed SQL SELECT string.
+SQL Generator -- turns a validated QuerySpec into a governed SQL SELECT string.
 
 The generator reads metric expressions, dimension columns, join paths, and
 security rules entirely from the semantic model.  It never invents its own
@@ -24,7 +24,6 @@ from src.core.logging import get_logger
 logger = get_logger(__name__)
 
 
-# ── Time-range resolution ────────────────────────────────
 
 _RANGE_RE = re.compile(
     r"last\s+(\d+)\s+(days?|weeks?|months?|years?)",
@@ -78,7 +77,6 @@ def _resolve_time_range(time_range: str | None) -> tuple[date, date] | None:
     return (start, today)
 
 
-# ── SQL builder ──────────────────────────────────────────
 
 def generate_sql(spec: QuerySpec, model: SemanticModel | None = None) -> str:
     """Build a governed SQL SELECT from a validated QuerySpec.
@@ -92,7 +90,6 @@ def generate_sql(spec: QuerySpec, model: SemanticModel | None = None) -> str:
     if metric is None:
         raise ValueError(f"Unknown metric '{spec.metric}'")
 
-    # ── SELECT clause ────────────────────────────────
     select_parts: list[str] = []
     group_parts: list[str] = []
 
@@ -112,10 +109,8 @@ def generate_sql(spec: QuerySpec, model: SemanticModel | None = None) -> str:
     # Metric expression is always last in SELECT
     select_parts.append(f"{metric.expression} AS {metric.name}")
 
-    # ── FROM clause ──────────────────────────────────
     from_clause = f"{metric.base_table} AS {metric.alias}"
 
-    # ── JOIN clauses ─────────────────────────────────
     joined_tables: set[str] = {metric.base_table}  # already in FROM
     join_clauses: list[str] = []
 
@@ -146,7 +141,7 @@ def generate_sql(spec: QuerySpec, model: SemanticModel | None = None) -> str:
             continue
         path = model.find_join_path(metric.base_table, tbl)
         if path is None:
-            logger.warning("No join path from %s to %s — skipping", metric.base_table, tbl)
+            logger.warning("No join path from %s to %s -- skipping", metric.base_table, tbl)
             continue
         for edge in path:
             if edge not in join_edges_used:
@@ -162,9 +157,9 @@ def generate_sql(spec: QuerySpec, model: SemanticModel | None = None) -> str:
             target = edge.left
             alias = edge.left_alias
         else:
-            # Both already joined or neither — skip
+            # Both already joined or neither -- skip
             if edge.left not in joined_tables and edge.right not in joined_tables:
-                # Neither — pick left as already in FROM (first edge case)
+                # Neither -- pick left as already in FROM (first edge case)
                 target = edge.right
                 alias = edge.right_alias
             else:
@@ -174,7 +169,6 @@ def generate_sql(spec: QuerySpec, model: SemanticModel | None = None) -> str:
         join_clauses.append(f"{jtype} JOIN {target} AS {alias} ON {edge.on}")
         joined_tables.add(target)
 
-    # ── WHERE clause ─────────────────────────────────
     where_parts: list[str] = []
 
     # Metric-level filters (e.g. status = 'completed')
@@ -205,7 +199,6 @@ def generate_sql(spec: QuerySpec, model: SemanticModel | None = None) -> str:
             where_parts.append(f"{col} >= '{start_str}'")
             where_parts.append(f"{col} <= '{end_str}'")
 
-    # ── Assemble ─────────────────────────────────────
     sql_lines: list[str] = []
 
     # CTE support for complex metrics (e.g. returning_customers)

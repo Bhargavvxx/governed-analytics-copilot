@@ -20,7 +20,6 @@ import yaml
 _SEMANTIC_PATH = Path(__file__).resolve().parents[2] / "semantic_layer" / "semantic_model.yml"
 
 
-# ── Typed domain objects ─────────────────────────────────
 
 @dataclass(frozen=True)
 class Metric:
@@ -76,7 +75,6 @@ class SemanticModel:
     security: SecurityRules
     allowed_tables: set[str]
 
-    # ── Convenience look-ups ─────────────────────────
 
     def metric(self, name: str) -> Metric | None:
         return self.metrics.get(name)
@@ -112,10 +110,9 @@ class SemanticModel:
             })
         return result
 
-    # ── Join graph helpers ───────────────────────────
 
     def find_join(self, left_table: str, right_table: str) -> JoinEdge | None:
-        """Return the join edge connecting *left_table* → *right_table* (either direction)."""
+        """Return the join edge connecting *left_table* -> *right_table* (either direction)."""
         for j in self.joins:
             if j.left == left_table and j.right == right_table:
                 return j
@@ -164,7 +161,7 @@ class SemanticModel:
         return None  # no path
 
     def alias_to_table(self) -> dict[str, str]:
-        """Return a map of alias → fully-qualified table name."""
+        """Return a map of alias -> fully-qualified table name."""
         mapping: dict[str, str] = {}
         for m in self.metrics.values():
             if m.alias and m.base_table:
@@ -178,7 +175,6 @@ class SemanticModel:
         return mapping
 
 
-# ── Parsing ──────────────────────────────────────────────
 
 def _parse_metric(raw: dict[str, Any]) -> Metric:
     return Metric(
@@ -245,7 +241,6 @@ def _parse_model(raw_yaml: dict[str, Any]) -> SemanticModel:
     )
 
 
-# ── Public API ───────────────────────────────────────────
 
 @lru_cache
 def load_semantic_model() -> SemanticModel:

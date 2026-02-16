@@ -1,5 +1,5 @@
 """
-Unit tests — validator: all 8 validation checks.
+Unit tests -- validator: all 8 validation checks.
 """
 import pytest
 from src.governance.semantic_loader import load_semantic_model, SemanticModel
@@ -11,7 +11,6 @@ def model() -> SemanticModel:
     return load_semantic_model()
 
 
-# ── Helper: build a valid spec ───────────────────────────
 
 def _valid_spec(**overrides) -> dict:
     base = {
@@ -25,7 +24,6 @@ def _valid_spec(**overrides) -> dict:
     return base
 
 
-# ── 0. Valid spec → no errors ────────────────────────────
 
 def test_valid_spec_no_errors(model):
     errors = validate_spec(_valid_spec(), model)
@@ -45,21 +43,18 @@ def test_valid_spec_multiple_dimensions(model):
     assert errors == []
 
 
-# ── 1. Unknown metric ───────────────────────────────────
 
 def test_unknown_metric(model):
     errors = validate_spec(_valid_spec(metric="nonexistent"), model)
     assert any("metric" in e.lower() and "nonexistent" in e for e in errors)
 
 
-# ── 2. Derived metric blocked ───────────────────────────
 
 def test_derived_metric_blocked(model):
     errors = validate_spec(_valid_spec(metric="conversion_proxy"), model)
     assert any("derived" in e.lower() or "cannot be queried" in e.lower() for e in errors)
 
 
-# ── 3. Unknown dimension ────────────────────────────────
 
 def test_unknown_dimension(model):
     errors = validate_spec(
@@ -69,7 +64,6 @@ def test_unknown_dimension(model):
     assert any("weather" in e for e in errors)
 
 
-# ── 4. Filter key not a valid dimension ──────────────────
 
 def test_filter_key_invalid(model):
     errors = validate_spec(
@@ -87,7 +81,6 @@ def test_filter_key_valid(model):
     assert errors == []
 
 
-# ── 5. Time grain validation ────────────────────────────
 
 def test_invalid_time_grain(model):
     errors = validate_spec(_valid_spec(time_grain="quarter"), model)
@@ -108,7 +101,6 @@ def test_no_time_grain(model):
     assert not any("grain" in e.lower() for e in errors)
 
 
-# ── 6. Join-path reachability ────────────────────────────
 
 def test_reachable_dimensions(model):
     """revenue is on fct_order_items; country is on dim_users; path exists via fct_orders"""
@@ -128,7 +120,6 @@ def test_reachable_category_from_revenue(model):
     assert errors == []
 
 
-# ── 7. Filter value sanity ──────────────────────────────
 
 def test_empty_string_filter_value(model):
     errors = validate_spec(
@@ -155,7 +146,6 @@ def test_list_filter_with_empty_element(model):
     assert any("empty" in e.lower() or "blank" in e.lower() for e in errors)
 
 
-# ── 8. Limit exceeds max_rows ───────────────────────────
 
 def test_limit_exceeds_max_rows(model):
     errors = validate_spec(_valid_spec(limit=500), model)
@@ -169,11 +159,10 @@ def test_limit_at_max(model):
 
 def test_limit_zero(model):
     errors = validate_spec(_valid_spec(limit=0), model)
-    # 0 is acceptable — means "no limit"
+    # 0 is acceptable -- means "no limit"
     assert not any("limit" in e.lower() for e in errors)
 
 
-# ── Edge cases ───────────────────────────────────────────
 
 def test_multiple_errors_at_once(model):
     """Valid metric + bad dimension + bad filter key + bad grain + over-limit.

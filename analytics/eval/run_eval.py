@@ -1,5 +1,5 @@
 """
-Evaluation harness — runs eval_questions.jsonl through the copilot
+Evaluation harness -- runs eval_questions.jsonl through the copilot
 and generates analytics/reports/eval_report.md.
 
 Checks:
@@ -200,14 +200,14 @@ def _generate_report(results: list[dict[str, Any]], questions: list[dict[str, An
     lines.append("|---|----------|-----------|---------|-----|------|---------|---------|------|")
 
     for i, (r, q) in enumerate(zip(results, questions), 1):
-        m = "✅" if r["metric_ok"] else "❌"
-        d = "✅" if r["dims_ok"] else "❌"
-        s = "✅" if r["sql_generated"] else "—"
-        rows = str(r["rows_returned"]) if r["rows_returned"] else "—"
-        b = "🛡️" if r["safety_blocked"] else "—"
-        p = "✅" if r["success"] else "❌"
+        m = "OK" if r["metric_ok"] else "ERROR"
+        d = "OK" if r["dims_ok"] else "ERROR"
+        s = "OK" if r["sql_generated"] else "--"
+        rows = str(r["rows_returned"]) if r["rows_returned"] else "--"
+        b = "BLOCKED" if r["safety_blocked"] else "--"
+        p = "OK" if r["success"] else "ERROR"
         lat = str(r["latency_ms"])
-        qtext = r["question"][:55] + ("…" if len(r["question"]) > 55 else "")
+        qtext = r["question"][:55] + ("..." if len(r["question"]) > 55 else "")
         lines.append(f"| {i} | {qtext} | {m} | {d} | {s} | {rows} | {b} | {lat} | {p} |")
 
     lines.append("")
@@ -230,7 +230,7 @@ def _generate_report(results: list[dict[str, Any]], questions: list[dict[str, An
     else:
         lines.append("## Failures")
         lines.append("")
-        lines.append("None — all questions handled correctly.")
+        lines.append("None -- all questions handled correctly.")
         lines.append("")
 
     return "\n".join(lines)

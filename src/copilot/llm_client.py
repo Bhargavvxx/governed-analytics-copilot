@@ -1,10 +1,10 @@
 """
-LLM client abstraction — provider-agnostic wrapper.
+LLM client abstraction -- provider-agnostic wrapper.
 
 Supported providers:
-  mock      — echo back the prompt (for tests / offline dev)
-  openai    — OpenAI ChatCompletion (gpt-4o-mini default)
-  anthropic — Anthropic Messages (claude-3-haiku default)
+  mock      -- echo back the prompt (for tests / offline dev)
+  openai    -- OpenAI ChatCompletion (gpt-4o-mini default)
+  anthropic -- Anthropic Messages (claude-3-haiku default)
 
 Configuration is read from Settings (env / .env).
 """
@@ -17,20 +17,17 @@ from src.core.logging import get_logger
 
 logger = get_logger(__name__)
 
-# ── Models defaults (cheap + fast) ───────────────────────
 
 _OPENAI_DEFAULT_MODEL = "gpt-4o-mini"
 _ANTHROPIC_DEFAULT_MODEL = "claude-3-haiku-20240307"
 
 
-# ── Mock provider ────────────────────────────────────────
 
 def _call_mock(prompt: str) -> str:
-    logger.info("LLM mock mode — returning echo")
+    logger.info("LLM mock mode -- returning echo")
     return f"[MOCK] {prompt[:200]}"
 
 
-# ── OpenAI provider ─────────────────────────────────────
 
 def _call_openai(prompt: str) -> str:
     """Call OpenAI ChatCompletion API."""
@@ -65,7 +62,6 @@ def _call_openai(prompt: str) -> str:
     return text
 
 
-# ── Anthropic provider ──────────────────────────────────
 
 def _call_anthropic(prompt: str) -> str:
     """Call Anthropic Messages API."""
@@ -96,7 +92,6 @@ def _call_anthropic(prompt: str) -> str:
     return text
 
 
-# ── Dispatcher ───────────────────────────────────────────
 
 _PROVIDERS: dict[str, Any] = {
     "mock": _call_mock,

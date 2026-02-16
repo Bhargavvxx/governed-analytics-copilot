@@ -1,5 +1,5 @@
 """
-Integration tests — placeholder.
+Integration tests -- placeholder.
 Full integration tests (DB required) added in Phase 6.
 """
 

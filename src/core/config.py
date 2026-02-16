@@ -16,19 +16,16 @@ load_dotenv(_ENV_PATH)
 
 
 class Settings(BaseSettings):
-    # ── Postgres ─────────────────────────────────────────
     postgres_user: str = "copilot"
     postgres_password: str = "copilot_pw"
     postgres_db: str = "analytics"
     postgres_host: str = "localhost"
     postgres_port: int = 5432
 
-    # ── LLM ──────────────────────────────────────────────
     llm_provider: str = "mock"  # mock | openai | anthropic
     openai_api_key: str = ""
     anthropic_api_key: str = ""
 
-    # ── App ──────────────────────────────────────────────
     api_port: int = 8000
     streamlit_port: int = 8501
     log_level: str = "INFO"

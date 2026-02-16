@@ -1,5 +1,5 @@
 """
-Integration tests — SQL executor against live PostgreSQL.
+Integration tests -- SQL executor against live PostgreSQL.
 
 These tests require a running Postgres instance with the analytics
 database populated by dbt.  They are automatically skipped when the
@@ -10,7 +10,6 @@ from __future__ import annotations
 import pytest
 from sqlalchemy import text
 
-# ── Guard: skip all tests if DB is unreachable ───────────
 try:
     from src.db.connection import get_engine
 
@@ -26,7 +25,6 @@ pytestmark = pytest.mark.skipif(not DB_AVAILABLE, reason="Postgres not reachable
 from src.db.executor import execute_readonly
 
 
-# ── Basic connectivity ───────────────────────────────────
 
 def test_simple_select():
     rows = execute_readonly("SELECT 1 AS n")
@@ -40,7 +38,6 @@ def test_multiple_rows():
     assert values == [1, 2, 3]
 
 
-# ── Read-only enforcement ───────────────────────────────
 
 def test_write_blocked():
     """READ ONLY transaction must reject INSERT/UPDATE/DELETE."""
@@ -48,7 +45,6 @@ def test_write_blocked():
         execute_readonly("CREATE TABLE _test_no_write (id INT)")
 
 
-# ── Timeout enforcement ─────────────────────────────────
 
 def test_timeout_fires():
     """Statement that exceeds timeout should be cancelled."""
@@ -56,7 +52,6 @@ def test_timeout_fires():
         execute_readonly("SELECT pg_sleep(30)", timeout_ms=200)
 
 
-# ── Decimal / date serialisation ─────────────────────────
 
 def test_decimal_serialised_to_float():
     rows = execute_readonly("SELECT 3.14::numeric AS val")
@@ -74,7 +69,6 @@ def test_timestamp_serialised_to_iso():
     assert rows[0]["ts"].startswith("2024-01-15T10:30:00")
 
 
-# ── Queries against mart tables ──────────────────────────
 
 def test_query_fct_orders():
     rows = execute_readonly(

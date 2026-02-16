@@ -2,16 +2,16 @@
 Deterministic SQL safety checks (non-LLM).
 
 These checks are the final gate before any SQL is executed against Postgres.
-They operate purely on the SQL text and the semantic model — no LLM involved.
+They operate purely on the SQL text and the semantic model -- no LLM involved.
 
 Checks performed:
   1. SQL must be a single SELECT statement (no DDL / DML / multi-statement)
   2. No SELECT *
-  3. No blocked schemas (pg_catalog, information_schema …)
-  4. No blocked columns (user_id, order_id …)
+  3. No blocked schemas (pg_catalog, information_schema ...)
+  4. No blocked columns (user_id, order_id ...)
   5. Only allowed tables may appear
   6. LIMIT must be present and ≤ max_rows
-  7. No dangerous keywords (DROP, ALTER, TRUNCATE, INSERT, UPDATE, DELETE, GRANT …)
+  7. No dangerous keywords (DROP, ALTER, TRUNCATE, INSERT, UPDATE, DELETE, GRANT ...)
   8. No sub-shells / command execution attempts (;, --, /*, xp_, COPY, \\!)
 """
 from __future__ import annotations
@@ -23,7 +23,6 @@ from src.core.logging import get_logger
 
 logger = get_logger(__name__)
 
-# ── Compiled patterns ────────────────────────────────────
 
 _DANGEROUS_KW = re.compile(
     r"\b(DROP|ALTER|TRUNCATE|INSERT|UPDATE|DELETE|MERGE|GRANT|REVOKE|"
@@ -65,40 +64,33 @@ def check_sql_safety(
     errors: list[str] = []
     sql_stripped = sql.strip()
 
-    # ── 1. Must start with SELECT (or WITH … SELECT for CTEs) ─────
     upper = sql_stripped.upper()
     if not (upper.startswith("SELECT") or upper.startswith("WITH")):
         errors.append("SQL must be a SELECT statement.")
 
-    # ── 2. No multi-statement ────────────────────────
     if _MULTI_STMT.search(sql_stripped):
         errors.append("Multi-statement SQL is not allowed (found ';' followed by another statement).")
 
-    # ── 3. No SELECT * ───────────────────────────────
     if _SELECT_STAR.search(sql_stripped):
         errors.append("SELECT * is not allowed. Specify explicit columns.")
 
-    # ── 4. No dangerous keywords ─────────────────────
     m = _DANGEROUS_KW.search(sql_stripped)
     if m:
         errors.append(f"Dangerous keyword detected: '{m.group(1).upper()}'.")
 
-    # ── 5. No SQL comments (injection vector) ────────
     if _COMMENT_INLINE.search(sql_stripped):
         errors.append("Inline comments (--) are not allowed.")
     if _COMMENT_BLOCK.search(sql_stripped):
         errors.append("Block comments (/* */) are not allowed.")
 
-    # ── 6. Blocked schemas ───────────────────────────
     blocked_schemas = model.security.blocked_schemas
     sql_lower = sql_stripped.lower()
     for schema in blocked_schemas:
         if f"{schema}." in sql_lower:
             errors.append(f"Blocked schema referenced: '{schema}'.")
 
-    # ── 7. Blocked columns ───────────────────────────
     # Only check in SELECT projection (before FROM)
-    # Columns inside aggregate functions (COUNT, SUM, …) are safe — the raw
+    # Columns inside aggregate functions (COUNT, SUM, ...) are safe -- the raw
     # value is never exposed to the user.
     select_section = sql_stripped
     from_idx = sql_lower.find("\nfrom ")
@@ -122,16 +114,14 @@ def check_sql_safety(
                 f"Blocked column '{col}' appears in the SELECT projection."
             )
 
-    # ── 8. Allowed tables only ───────────────────────
     table_refs = _FROM_JOIN_RE.findall(sql_stripped)
     for ref in table_refs:
-        # ref might be an alias-only (single word) — skip those
+        # ref might be an alias-only (single word) -- skip those
         if "." not in ref:
             continue
         if ref.lower() not in {t.lower() for t in model.allowed_tables}:
             errors.append(f"Table '{ref}' is not in the allowed tables list.")
 
-    # ── 9. LIMIT must exist and be ≤ max_rows ───────
     limit_match = _LIMIT_RE.search(sql_stripped)
     if not limit_match:
         errors.append(f"SQL must include a LIMIT clause (max {model.security.max_rows}).")

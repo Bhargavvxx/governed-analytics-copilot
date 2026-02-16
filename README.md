@@ -59,9 +59,9 @@ Every column, join, and filter was derived from the semantic layer — no arbitr
 
 | Input | Result |
 |-------|--------|
-| `"Show me user_id and emails"` | 🛡️ Blocked — PII request detected |
-| `"DROP TABLE users"` | 🛡️ Blocked — DDL/injection pattern |
-| `"SELECT * FROM pg_catalog.pg_tables"` | 🛡️ Blocked — system catalog access |
+| `"Show me user_id and emails"` | Blocked Blocked — PII request detected |
+| `"DROP TABLE users"` | Blocked Blocked — DDL/injection pattern |
+| `"SELECT * FROM pg_catalog.pg_tables"` | Blocked Blocked — system catalog access |
 
 ---
 
@@ -114,13 +114,13 @@ governed-analytics-copilot/
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| 1 | ✅ Done | Scaffold + runnable skeleton (68 files) |
-| 2 | ✅ Done | Database DDL + seed generator + dbt models (10 models, 50 dbt tests) |
-| 3 | ✅ Done | Semantic layer YAML + loader + validator (45 unit tests) |
-| 4 | ✅ Done | NL→SQL copilot core (mock + LLM mode) + 9 safety gates (142 tests) |
-| 5 | ✅ Done | FastAPI endpoints + Streamlit UI (160 tests) |
-| 6 | ✅ Done | SQL execution + query logging + eval harness (184 tests, 50/50 eval) |
-| 7 | ⬜ | Docs polish + CI/CD |
+| 1 | Done Done | Scaffold + runnable skeleton (68 files) |
+| 2 | Done Done | Database DDL + seed generator + dbt models (10 models, 50 dbt tests) |
+| 3 | Done Done | Semantic layer YAML + loader + validator (45 unit tests) |
+| 4 | Done Done | NL→SQL copilot core (mock + LLM mode) + 9 safety gates (142 tests) |
+| 5 | Done Done | FastAPI endpoints + Streamlit UI (160 tests) |
+| 6 | Done Done | SQL execution + query logging + eval harness (184 tests, 50/50 eval) |
+| 7 | Pending | Docs polish + CI/CD |
 
 ## License
 

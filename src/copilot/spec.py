@@ -1,5 +1,5 @@
 """
-QuerySpec — the structured intermediate representation between
+QuerySpec -- the structured intermediate representation between
 natural language and SQL.
 """
 from __future__ import annotations

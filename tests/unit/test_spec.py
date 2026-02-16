@@ -1,5 +1,5 @@
 """
-Unit tests — smoke test for imports & QuerySpec.
+Unit tests -- smoke test for imports & QuerySpec.
 """
 from src.copilot.spec import QuerySpec
 

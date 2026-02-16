@@ -1,5 +1,5 @@
 """
-Unit tests — SQL generator: builds governed SQL from QuerySpec.
+Unit tests -- SQL generator: builds governed SQL from QuerySpec.
 """
 import re
 import pytest
@@ -13,7 +13,6 @@ def model():
     return load_semantic_model()
 
 
-# ── Helper ───────────────────────────────────────────────
 
 def _spec(**overrides) -> QuerySpec:
     defaults = dict(
@@ -28,7 +27,6 @@ def _spec(**overrides) -> QuerySpec:
     return QuerySpec(**defaults)
 
 
-# ── Basic structure ──────────────────────────────────────
 
 def test_generates_select(model):
     sql = generate_sql(_spec(), model)
@@ -55,7 +53,6 @@ def test_has_order_by(model):
     assert "ORDER BY revenue DESC" in sql
 
 
-# ── Metric expression ───────────────────────────────────
 
 def test_revenue_expression(model):
     sql = generate_sql(_spec(), model)
@@ -72,7 +69,6 @@ def test_aov_expression(model):
     assert "NULLIF" in sql
 
 
-# ── Metric filters ───────────────────────────────────────
 
 def test_revenue_has_completed_filter(model):
     sql = generate_sql(_spec(), model)
@@ -84,7 +80,6 @@ def test_orders_has_completed_filter(model):
     assert "o.status = 'completed'" in sql
 
 
-# ── Dimensions and GROUP BY ──────────────────────────────
 
 def test_country_dimension(model):
     sql = generate_sql(_spec(dimensions=["country"]), model)
@@ -121,7 +116,6 @@ def test_multiple_dimensions(model):
     assert "GROUP BY" in sql
 
 
-# ── Joins ────────────────────────────────────────────────
 
 def test_country_join(model):
     sql = generate_sql(_spec(dimensions=["country"]), model)
@@ -141,12 +135,11 @@ def test_date_join(model):
 
 
 def test_no_unnecessary_joins(model):
-    """No dimensions → no joins needed beyond base table."""
+    """No dimensions -> no joins needed beyond base table."""
     sql = generate_sql(_spec(), model)
     assert "JOIN" not in sql.upper()
 
 
-# ── Spec-level filters ──────────────────────────────────
 
 def test_country_filter_single(model):
     sql = generate_sql(_spec(filters={"country": ["US"]}), model)
@@ -160,7 +153,6 @@ def test_country_filter_multi(model):
     assert "'IN'" in sql
 
 
-# ── Time range ───────────────────────────────────────────
 
 def test_time_range_adds_where(model):
     sql = generate_sql(
@@ -189,14 +181,12 @@ def test_resolve_time_range_none():
     assert _resolve_time_range("") is None
 
 
-# ── Error handling ───────────────────────────────────────
 
 def test_unknown_metric_raises(model):
     with pytest.raises(ValueError, match="Unknown metric"):
         generate_sql(_spec(metric="nonexistent"), model)
 
 
-# ── Full end-to-end SQL shape ────────────────────────────
 
 def test_full_sql_shape(model):
     sql = generate_sql(

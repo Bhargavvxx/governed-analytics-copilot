@@ -1,5 +1,5 @@
 """
-Streamlit page — Query History.
+Streamlit page -- Query History.
 """
 import streamlit as st
 

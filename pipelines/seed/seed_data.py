@@ -1,5 +1,5 @@
 """
-Seed data generator — creates realistic e-commerce data in the raw schema.
+Seed data generator -- creates realistic e-commerce data in the raw schema.
 
 Generates:
   - ~2 000 users
@@ -22,7 +22,6 @@ from dotenv import load_dotenv
 from faker import Faker
 from sqlalchemy import create_engine, text
 
-# ── Load .env from project root ─────────────────────────
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(_PROJECT_ROOT / ".env")
 
@@ -30,7 +29,6 @@ fake = Faker()
 Faker.seed(42)
 random.seed(42)
 
-# ── Tunables ─────────────────────────────────────────────
 NUM_USERS = 2_000
 NUM_PRODUCTS = 200
 NUM_ORDERS = 10_000
@@ -54,7 +52,6 @@ BRANDS = [
     "ZetaSport", "EtaBeauty", "ThetaPlay", "IotaAuto", "KappaFresh",
 ]
 
-# ── Helper: date ranges ─────────────────────────────────
 DATE_START = datetime(2024, 1, 1)
 DATE_END = datetime(2025, 12, 31)
 DATE_RANGE_DAYS = (DATE_END - DATE_START).days
@@ -78,7 +75,6 @@ def _db_url() -> str:
     return f"postgresql://{user}:{pw}@{host}:{port}/{db}"
 
 
-# ── Generators ───────────────────────────────────────────
 
 def gen_users() -> list[dict]:
     rows = []
@@ -150,7 +146,6 @@ def gen_sessions(users: list[dict]) -> list[dict]:
     return rows
 
 
-# ── Bulk insert helper ───────────────────────────────────
 
 def _bulk_insert(engine, table: str, rows: list[dict], batch_size: int = 2000):
     """Insert rows into *table* in batches using executemany-style VALUES."""
@@ -163,17 +158,16 @@ def _bulk_insert(engine, table: str, rows: list[dict], batch_size: int = 2000):
     with engine.begin() as conn:
         for i in range(0, len(rows), batch_size):
             conn.execute(sql, rows[i : i + batch_size])
-    print(f"  ✓ {table}: {len(rows):,} rows")
+    print(f"  {table}: {len(rows):,} rows")
 
 
-# ── Main ─────────────────────────────────────────────────
 
 def main():
-    print("═══ Seed Data Generator ═══")
+    print("=== Seed Data Generator ===")
     engine = create_engine(_db_url(), echo=False)
 
     # Truncate existing data for idempotency
-    print("Truncating raw tables …")
+    print("Truncating raw tables ...")
     with engine.begin() as conn:
         for t in [
             "raw.raw_order_items",
@@ -184,20 +178,20 @@ def main():
         ]:
             conn.execute(text(f"TRUNCATE TABLE {t} CASCADE"))
 
-    print("Generating data …")
+    print("Generating data ...")
     users = gen_users()
     products = gen_products()
     orders, items = gen_orders(users)
     sessions = gen_sessions(users)
 
-    print("Inserting …")
+    print("Inserting ...")
     _bulk_insert(engine, "raw.raw_users", users)
     _bulk_insert(engine, "raw.raw_products", products)
     _bulk_insert(engine, "raw.raw_orders", orders)
     _bulk_insert(engine, "raw.raw_order_items", items)
     _bulk_insert(engine, "raw.raw_sessions", sessions)
 
-    print(f"\nDone — seeded {len(users):,} users, {len(products):,} products, "
+    print(f"\nDone -- seeded {len(users):,} users, {len(products):,} products, "
           f"{len(orders):,} orders, {len(items):,} items, {len(sessions):,} sessions.")
 
 

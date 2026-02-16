@@ -1,5 +1,5 @@
 """
-Integration tests — query audit log.
+Integration tests -- query audit log.
 
 Requires live Postgres with the analytics database.
 """
@@ -8,7 +8,6 @@ from __future__ import annotations
 import pytest
 from sqlalchemy import text
 
-# ── Guard: skip if DB is unreachable ─────────────────────
 try:
     from src.db.connection import get_engine
 
@@ -24,7 +23,6 @@ pytestmark = pytest.mark.skipif(not DB_AVAILABLE, reason="Postgres not reachable
 from src.db.query_log import ensure_log_table, log_query
 
 
-# ── Table creation ───────────────────────────────────────
 
 def test_ensure_log_table_idempotent():
     """Calling ensure_log_table() multiple times must not raise."""
@@ -44,7 +42,6 @@ def test_log_table_exists():
     assert len(rows) == 1
 
 
-# ── Insert audit row ────────────────────────────────────
 
 def test_log_query_inserts_row():
     ensure_log_table()

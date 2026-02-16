@@ -1,5 +1,5 @@
 """
-GET /metrics, GET /dimensions, GET /catalog — metadata endpoints.
+GET /metrics, GET /dimensions, GET /catalog -- metadata endpoints.
 """
 from __future__ import annotations
 
@@ -11,7 +11,6 @@ from src.governance.semantic_loader import load_semantic_model
 router = APIRouter()
 
 
-# ── Response schemas ─────────────────────────────────────
 
 class MetricItem(BaseModel):
     name: str
@@ -32,7 +31,6 @@ class CatalogResponse(BaseModel):
     max_rows: int
 
 
-# ── Endpoints ────────────────────────────────────────────
 
 @router.get("/metrics")
 def list_metrics() -> dict:

@@ -1,4 +1,4 @@
-"""POST /ask — main copilot endpoint."""
+"""POST /ask -- main copilot endpoint."""
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
@@ -14,7 +14,6 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-# ── Request / Response schemas ───────────────────────────
 
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=3, max_length=500, description="Natural-language business question")
@@ -49,11 +48,10 @@ class ExplainResponse(BaseModel):
     is_valid: bool
 
 
-# ── Endpoints ────────────────────────────────────────────
 
 @router.post("", response_model=AskResponse)
 def ask_endpoint(req: AskRequest):
-    """Full pipeline: question → spec → validate → SQL → safety check → execute."""
+    """Full pipeline: question -> spec -> validate -> SQL -> safety check -> execute."""
     try:
         result = copilot_ask(req.question, mode=req.mode, execute=req.execute)
     except Exception as exc:
@@ -74,7 +72,7 @@ def ask_endpoint(req: AskRequest):
 
 @router.post("/explain", response_model=ExplainResponse)
 def explain_endpoint(req: AskRequest):
-    """Dry-run: question → spec → validate (no SQL generation)."""
+    """Dry-run: question -> spec -> validate (no SQL generation)."""
     try:
         model = load_semantic_model()
         spec = copilot_plan(req.question, mode=req.mode)

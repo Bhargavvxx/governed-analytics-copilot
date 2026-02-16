@@ -1,5 +1,5 @@
 """
-Copilot query audit log — records every question → SQL → result cycle.
+Copilot query audit log -- records every question -> SQL -> result cycle.
 
 The table is created automatically on first use via `ensure_log_table()`.
 """
@@ -97,4 +97,4 @@ def log_query(
             conn.commit()
         logger.debug("Query logged: question=%s", question[:80])
     except Exception:
-        logger.exception("Failed to log query — continuing without logging")
+        logger.exception("Failed to log query -- continuing without logging")

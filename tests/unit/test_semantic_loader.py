@@ -1,5 +1,5 @@
 """
-Unit tests — semantic loader: parsing, lookups, join graph.
+Unit tests -- semantic loader: parsing, lookups, join graph.
 """
 from src.governance.semantic_loader import (
     load_semantic_model,
@@ -12,7 +12,6 @@ from src.governance.semantic_loader import (
 )
 
 
-# ── Basic loading ────────────────────────────────────────
 
 def test_loads_without_error():
     model = load_semantic_model()
@@ -43,7 +42,6 @@ def test_dimension_names_loaded():
     assert len(names) == 6
 
 
-# ── Metric objects ───────────────────────────────────────
 
 def test_metric_revenue_definition():
     model = load_semantic_model()
@@ -71,7 +69,6 @@ def test_metric_not_found_returns_none():
     assert model.metric("nonexistent_metric") is None
 
 
-# ── Dimension objects ────────────────────────────────────
 
 def test_dimension_date_has_grains():
     model = load_semantic_model()
@@ -93,7 +90,6 @@ def test_dimension_country():
     assert d.alias == "u"
 
 
-# ── Join graph ───────────────────────────────────────────
 
 def test_joins_loaded():
     model = load_semantic_model()
@@ -120,8 +116,8 @@ def test_find_join_reverse():
 def test_find_join_not_exists():
     model = load_semantic_model()
     j = model.find_join("marts_marts.dim_users", "raw.raw_sessions")
-    # dim_users is not directly connected to raw_sessions (sessions→dim_users, not reverse-keyed)
-    # Actually it IS — raw_sessions -> dim_users exists
+    # dim_users is not directly connected to raw_sessions (sessions->dim_users, not reverse-keyed)
+    # Actually it IS -- raw_sessions -> dim_users exists
     # So let's test a truly impossible join
     j2 = model.find_join("marts_marts.dim_products", "raw.raw_sessions")
     assert j2 is None
@@ -159,7 +155,6 @@ def test_find_join_path_same_table():
     assert path == []
 
 
-# ── Security ─────────────────────────────────────────────
 
 def test_security_blocked_columns():
     model = load_semantic_model()
@@ -177,7 +172,6 @@ def test_security_read_only():
     assert model.security.read_only is True
 
 
-# ── Allowed tables ───────────────────────────────────────
 
 def test_allowed_tables():
     model = load_semantic_model()
@@ -187,7 +181,6 @@ def test_allowed_tables():
     assert "pg_catalog.pg_tables" not in model.allowed_tables
 
 
-# ── Alias mapping ────────────────────────────────────────
 
 def test_alias_to_table():
     model = load_semantic_model()

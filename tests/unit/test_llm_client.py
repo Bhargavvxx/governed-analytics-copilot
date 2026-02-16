@@ -1,5 +1,5 @@
 """
-Unit tests — LLM client: mock mode + dispatch.
+Unit tests -- LLM client: mock mode + dispatch.
 """
 import pytest
 from src.copilot.llm_client import call_llm
@@ -39,6 +39,6 @@ def test_anthropic_missing_key_raises():
 
 
 def test_default_provider_is_mock():
-    """Settings default to mock — this should work without any keys."""
+    """Settings default to mock -- this should work without any keys."""
     result = call_llm("test")
     assert "[MOCK]" in result

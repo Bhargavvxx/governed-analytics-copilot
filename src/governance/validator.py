@@ -34,7 +34,6 @@ def validate_spec(spec: dict[str, Any], model: SemanticModel | None = None) -> l
 
     errors: list[str] = []
 
-    # ── 1. Metric must exist ─────────────────────────
     metric_name: str = spec.get("metric", "")
     if not metric_name:
         errors.append("No metric specified.")
@@ -48,7 +47,6 @@ def validate_spec(spec: dict[str, Any], model: SemanticModel | None = None) -> l
         )
         return errors  # can't do further validation
 
-    # ── 2. Derived metrics are not directly queryable ─
     if metric_def.is_derived:
         errors.append(
             f"Metric '{metric_name}' is a derived/composite metric and cannot be queried directly. "
@@ -56,7 +54,6 @@ def validate_spec(spec: dict[str, Any], model: SemanticModel | None = None) -> l
         )
         return errors
 
-    # ── 3. Every dimension must exist ────────────────
     requested_dims: list[str] = spec.get("dimensions") or []
     for dim_name in requested_dims:
         if model.dimension(dim_name) is None:
@@ -65,7 +62,6 @@ def validate_spec(spec: dict[str, Any], model: SemanticModel | None = None) -> l
                 f"Allowed: {', '.join(model.get_dimension_names())}"
             )
 
-    # ── 4. Filter keys must be valid dimensions ──────
     filters: dict[str, list[str]] = spec.get("filters") or {}
     for filter_key in filters:
         if model.dimension(filter_key) is None:
@@ -74,7 +70,6 @@ def validate_spec(spec: dict[str, Any], model: SemanticModel | None = None) -> l
                 f"Allowed: {', '.join(model.get_dimension_names())}"
             )
 
-    # ── 5. Time grain validation ─────────────────────
     time_grain: str | None = spec.get("time_grain")
     if time_grain:
         date_dim = model.dimension("date")
@@ -89,7 +84,6 @@ def validate_spec(spec: dict[str, Any], model: SemanticModel | None = None) -> l
     if errors:
         return errors
 
-    # ── 6. Join path reachability ────────────────────
     base_table = metric_def.base_table
     if base_table:
         # Collect all dimension tables needed
@@ -121,7 +115,6 @@ def validate_spec(spec: dict[str, Any], model: SemanticModel | None = None) -> l
                         f"No approved join path from '{base_table}' to '{tbl}'."
                     )
 
-    # ── 7. Filter value sanity ───────────────────────
     for filter_key, values in filters.items():
         if not isinstance(values, list):
             errors.append(f"Filter '{filter_key}' values must be a list.")
@@ -132,7 +125,6 @@ def validate_spec(spec: dict[str, Any], model: SemanticModel | None = None) -> l
                 if not isinstance(v, str) or not v.strip():
                     errors.append(f"Filter '{filter_key}' has an invalid/empty value: {v!r}")
 
-    # ── 8. Limit validation ──────────────────────────
     limit = spec.get("limit", 200)
     max_rows = model.security.max_rows
     if isinstance(limit, int) and limit > max_rows:

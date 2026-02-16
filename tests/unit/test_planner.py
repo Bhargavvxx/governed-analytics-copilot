@@ -1,5 +1,5 @@
 """
-Unit tests — planner: mock-mode keyword extraction.
+Unit tests -- planner: mock-mode keyword extraction.
 """
 import pytest
 from src.copilot.planner import plan, _plan_mock, _parse_llm_response
@@ -12,7 +12,6 @@ def model():
     return load_semantic_model()
 
 
-# ── Metric detection ─────────────────────────────────────
 
 def test_revenue_detected():
     spec = plan("What is the total revenue this year?")
@@ -49,7 +48,6 @@ def test_fallback_to_revenue():
     assert spec.metric == "revenue"
 
 
-# ── Dimension detection ──────────────────────────────────
 
 def test_date_dimension():
     spec = plan("Revenue over time")
@@ -87,7 +85,6 @@ def test_no_dimensions():
     assert spec.dimensions == [] or spec.metric == "revenue"
 
 
-# ── Time grain ───────────────────────────────────────────
 
 def test_grain_daily():
     spec = plan("Daily revenue last 30 days")
@@ -109,7 +106,6 @@ def test_date_dimension_defaults_to_month():
     assert spec.time_grain == "month"
 
 
-# ── Time range ───────────────────────────────────────────
 
 def test_time_range_last_6_months():
     spec = plan("Revenue last 6 months")
@@ -131,7 +127,6 @@ def test_time_range_this_year():
     assert spec.time_range == "this year"
 
 
-# ── Filters ──────────────────────────────────────────────
 
 def test_country_filter():
     spec = plan("Revenue in US last 6 months")
@@ -144,7 +139,6 @@ def test_multi_country_filter():
     assert "IN" in spec.filters.get("country", [])
 
 
-# ── Limit extraction ────────────────────────────────────
 
 def test_top_10():
     spec = plan("Top 10 products by revenue")
@@ -156,7 +150,6 @@ def test_limit_capped_at_max_rows():
     assert spec.limit <= 200
 
 
-# ── QuerySpec output ─────────────────────────────────────
 
 def test_returns_query_spec():
     spec = plan("Revenue by country last 6 months")
@@ -164,7 +157,6 @@ def test_returns_query_spec():
     assert spec.metric == "revenue"
 
 
-# ── LLM response parsing ────────────────────────────────
 
 def test_parse_valid_llm_json(model):
     json_text = '{"metric": "orders", "dimensions": ["country"], "filters": {}, "time_grain": "month", "time_range": "last 6 months", "limit": 50}'

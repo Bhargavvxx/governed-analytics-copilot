@@ -1,5 +1,5 @@
 """
-Streamlit UI — Governed Analytics Copilot.
+Streamlit UI -- Governed Analytics Copilot.
 
 Features:
   - Persistent chat history (session state)
@@ -13,19 +13,17 @@ import httpx
 import pandas as pd
 import json
 
-# ── Config ───────────────────────────────────────────────
 
 API_BASE = "http://localhost:8000"
 _TIMEOUT = 30
 
 st.set_page_config(
     page_title="Governed Analytics Copilot",
-    page_icon="🔒",
+    page_icon="chart_with_upwards_trend",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# ── Session state init ───────────────────────────────────
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -34,7 +32,6 @@ if "catalog" not in st.session_state:
     st.session_state.catalog = None
 
 
-# ── Sidebar — Catalog ───────────────────────────────────
 
 def _load_catalog():
     """Fetch /catalog from the API; cache in session_state."""
@@ -49,7 +46,7 @@ with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/graph-report.png", width=64)
     st.title("Catalog")
 
-    if st.button("🔄 Refresh catalog", use_container_width=True):
+    if st.button("Refresh catalog", use_container_width=True):
         _load_catalog()
 
     if st.session_state.catalog is None:
@@ -59,7 +56,7 @@ with st.sidebar:
 
     if catalog:
         # Metrics
-        st.subheader("📊 Metrics")
+        st.subheader("Metrics")
         for m in catalog.get("metrics", []):
             label = f"**{m['name']}**"
             if m.get("is_derived"):
@@ -70,7 +67,7 @@ with st.sidebar:
         st.divider()
 
         # Dimensions
-        st.subheader("🏷️ Dimensions")
+        st.subheader("Dimensions")
         for d in catalog.get("dimensions", []):
             grains = d.get("grains", [])
             grain_str = f" (grains: {', '.join(grains)})" if grains else ""
@@ -79,24 +76,22 @@ with st.sidebar:
         st.divider()
 
         # Settings
-        st.subheader("⚙️ Limits")
+        st.subheader("Limits")
         st.write(f"Max rows: **{catalog.get('max_rows', 200)}**")
         st.write(f"Allowed tables: **{len(catalog.get('allowed_tables', []))}**")
     else:
-        st.info("API not reachable — start the FastAPI server first.\n\n```\nuvicorn src.api.main:app --reload\n```")
+        st.info("API not reachable -- start the FastAPI server first.\n\n```\nuvicorn src.api.main:app --reload\n```")
 
     st.divider()
     st.caption("Governed Analytics Copilot v0.5")
 
 
-# ── Main area ────────────────────────────────────────────
 
-st.title("🔒 Governed Analytics Copilot")
+st.title("Governed Analytics Copilot")
 st.markdown("Ask a business question in plain English. The copilot will plan, validate, and generate governed SQL.")
 
-# ── Example questions ────────────────────────────────────
 
-with st.expander("💡 Example questions", expanded=False):
+with st.expander("Example questions", expanded=False):
     examples = [
         "Revenue by country last 6 months",
         "Monthly orders this year",
@@ -110,45 +105,44 @@ with st.expander("💡 Example questions", expanded=False):
         if cols[i % 2].button(ex, key=f"ex_{i}", use_container_width=True):
             st.session_state.prefill = ex
 
-# ── Chat history display ────────────────────────────────
 
 def _render_response(data: dict):
     """Render a copilot response inside a chat message."""
     success = data.get("success", False)
 
     if success:
-        st.success(f"✅ Query planned successfully  ·  {data.get('latency_ms', 0)} ms")
+        st.success(f"OK: Query planned successfully  ·  {data.get('latency_ms', 0)} ms")
     else:
-        st.error("❌ Query has issues — check audit panel below")
+        st.error("ERROR: Query has issues -- check audit panel below")
 
     # Validation / safety errors
     v_errors = data.get("validation_errors", [])
     s_errors = data.get("safety_errors", [])
     if v_errors or s_errors:
-        with st.expander("🚫 Errors", expanded=True):
+        with st.expander("Errors", expanded=True):
             for e in v_errors:
                 st.error(f"**Validation:** {e}")
             for e in s_errors:
                 st.error(f"**Safety:** {e}")
 
     # QuerySpec
-    with st.expander("📋 QuerySpec", expanded=False):
+    with st.expander("QuerySpec", expanded=False):
         st.json(data.get("spec", {}))
 
     # Generated SQL
     sql = data.get("sql", "")
     if sql:
-        with st.expander("🔧 Generated SQL", expanded=True):
+        with st.expander("Generated SQL", expanded=True):
             st.code(sql, language="sql")
 
     # Results table
     rows = data.get("rows", [])
     if rows:
-        st.subheader("📊 Results")
+        st.subheader("Results")
         df = pd.DataFrame(rows)
         st.dataframe(df, use_container_width=True)
         st.download_button(
-            "⬇️ Download CSV",
+            "Download CSV",
             df.to_csv(index=False),
             file_name="copilot_results.csv",
             mime="text/csv",
@@ -157,7 +151,7 @@ def _render_response(data: dict):
         st.info("No result rows yet (SQL execution available in Phase 6).")
 
     # Audit panel
-    with st.expander("🔍 Audit Trail", expanded=False):
+    with st.expander("Audit Trail", expanded=False):
         st.write("**Question:**", data.get("question", ""))
         st.write("**Latency:**", f"{data.get('latency_ms', 0)} ms")
         st.write("**Validation errors:**", v_errors if v_errors else "None")
@@ -172,11 +166,10 @@ for msg in st.session_state.messages:
             _render_response(msg["data"]) if "data" in msg else st.markdown(msg["content"])
 
 
-# ── Chat input ───────────────────────────────────────────
 
 # Handle prefilled example question
 prefill = st.session_state.pop("prefill", None)
-question = st.chat_input("Ask a business question…") or prefill
+question = st.chat_input("Ask a business question...") or prefill
 
 if question:
     # Display user message
@@ -186,7 +179,7 @@ if question:
 
     # Call API
     with st.chat_message("assistant"):
-        with st.spinner("Planning and validating…"):
+        with st.spinner("Planning and validating..."):
             try:
                 resp = httpx.post(
                     f"{API_BASE}/ask",
@@ -196,7 +189,7 @@ if question:
                 resp.raise_for_status()
                 data = resp.json()
             except httpx.ConnectError:
-                st.error("🔌 Cannot reach the API. Start it with:\n```\nuvicorn src.api.main:app --reload\n```")
+                st.error("Cannot reach the API. Start it with:\n```\nuvicorn src.api.main:app --reload\n```")
                 st.stop()
             except httpx.HTTPStatusError as exc:
                 st.error(f"API returned {exc.response.status_code}: {exc.response.text}")
