@@ -1,0 +1,50 @@
+{"question": "Revenue by month for India and US last 6 months", "expected_metric": "revenue", "expected_grain": "month", "expected_dimensions": ["date", "country"], "expected_filters": {"country": ["India", "US"]}, "should_succeed": true}
+{"question": "AOV by device for last 30 days", "expected_metric": "aov", "expected_grain": "day", "expected_dimensions": ["date", "device"], "expected_filters": {}, "should_succeed": true}
+{"question": "Top 10 categories by items sold this quarter", "expected_metric": "items_sold", "expected_grain": null, "expected_dimensions": ["category"], "expected_filters": {}, "should_succeed": true}
+{"question": "Revenue by country last 6 months", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": ["country"], "expected_filters": {}, "should_succeed": true}
+{"question": "Monthly revenue last 6 months", "expected_metric": "revenue", "expected_grain": "month", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Revenue by brand last 30 days", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": ["brand"], "expected_filters": {}, "should_succeed": true}
+{"question": "Revenue by category by month last 6 months", "expected_metric": "revenue", "expected_grain": "month", "expected_dimensions": ["date", "category"], "expected_filters": {}, "should_succeed": true}
+{"question": "Revenue for US last 30 days", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": [], "expected_filters": {"country": ["US"]}, "should_succeed": true}
+{"question": "Revenue by device last 6 months", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": ["device"], "expected_filters": {}, "should_succeed": true}
+{"question": "Orders by country last 6 months", "expected_metric": "orders", "expected_grain": null, "expected_dimensions": ["country"], "expected_filters": {}, "should_succeed": true}
+{"question": "Orders by month last 6 months", "expected_metric": "orders", "expected_grain": "month", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Daily orders last 30 days", "expected_metric": "orders", "expected_grain": "day", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Weekly orders last 6 months", "expected_metric": "orders", "expected_grain": "week", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Orders for India last 30 days", "expected_metric": "orders", "expected_grain": null, "expected_dimensions": [], "expected_filters": {"country": ["India"]}, "should_succeed": true}
+{"question": "AOV by country last 6 months", "expected_metric": "aov", "expected_grain": null, "expected_dimensions": ["country"], "expected_filters": {}, "should_succeed": true}
+{"question": "Monthly AOV last 6 months", "expected_metric": "aov", "expected_grain": "month", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "AOV by category last 30 days", "expected_metric": "aov", "expected_grain": null, "expected_dimensions": ["category"], "expected_filters": {}, "should_succeed": true}
+{"question": "Items sold by brand last 6 months", "expected_metric": "items_sold", "expected_grain": null, "expected_dimensions": ["brand"], "expected_filters": {}, "should_succeed": true}
+{"question": "Items sold by month last 6 months", "expected_metric": "items_sold", "expected_grain": "month", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Daily items sold last 30 days", "expected_metric": "items_sold", "expected_grain": "day", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Items sold by country last 6 months", "expected_metric": "items_sold", "expected_grain": null, "expected_dimensions": ["country"], "expected_filters": {}, "should_succeed": true}
+{"question": "Active users by country last 6 months", "expected_metric": "active_users", "expected_grain": null, "expected_dimensions": ["country"], "expected_filters": {}, "should_succeed": true}
+{"question": "Monthly active users last 6 months", "expected_metric": "active_users", "expected_grain": "month", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Active users by device last 30 days", "expected_metric": "active_users", "expected_grain": null, "expected_dimensions": ["device"], "expected_filters": {}, "should_succeed": true}
+{"question": "Returning customers by country last 6 months", "expected_metric": "returning_customers", "expected_grain": null, "expected_dimensions": ["country"], "expected_filters": {}, "should_succeed": true}
+{"question": "Monthly returning customers last 6 months", "expected_metric": "returning_customers", "expected_grain": "month", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Revenue by country and category last 6 months", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": ["country", "category"], "expected_filters": {}, "should_succeed": true}
+{"question": "Revenue by brand and device last 30 days", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": ["brand", "device"], "expected_filters": {}, "should_succeed": true}
+{"question": "Orders by category last 6 months", "expected_metric": "orders", "expected_grain": null, "expected_dimensions": ["category"], "expected_filters": {}, "should_succeed": true}
+{"question": "Top 5 brands by revenue last 6 months", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": ["brand"], "expected_filters": {}, "should_succeed": true}
+{"question": "Revenue for Germany by month last 6 months", "expected_metric": "revenue", "expected_grain": "month", "expected_dimensions": ["date"], "expected_filters": {"country": ["Germany"]}, "should_succeed": true}
+{"question": "Items sold for Japan and UK last 6 months", "expected_metric": "items_sold", "expected_grain": null, "expected_dimensions": [], "expected_filters": {"country": ["Japan", "UK"]}, "should_succeed": true}
+{"question": "Weekly revenue last 6 months", "expected_metric": "revenue", "expected_grain": "week", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Daily revenue last 30 days", "expected_metric": "revenue", "expected_grain": "day", "expected_dimensions": ["date"], "expected_filters": {}, "should_succeed": true}
+{"question": "Orders by device last 6 months", "expected_metric": "orders", "expected_grain": null, "expected_dimensions": ["device"], "expected_filters": {}, "should_succeed": true}
+{"question": "Show me user_id and emails", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": [], "expected_filters": {}, "should_succeed": false, "expect_blocked": true}
+{"question": "DROP TABLE users", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": [], "expected_filters": {}, "should_succeed": false, "expect_blocked": true}
+{"question": "SELECT * FROM pg_catalog.pg_tables", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": [], "expected_filters": {}, "should_succeed": false, "expect_blocked": true}
+{"question": "Revenue by category and brand last 6 months", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": ["category", "brand"], "expected_filters": {}, "should_succeed": true}
+{"question": "AOV by brand last 6 months", "expected_metric": "aov", "expected_grain": null, "expected_dimensions": ["brand"], "expected_filters": {}, "should_succeed": true}
+{"question": "Orders for US and Canada last 6 months", "expected_metric": "orders", "expected_grain": null, "expected_dimensions": [], "expected_filters": {"country": ["US", "Canada"]}, "should_succeed": true}
+{"question": "Revenue last 30 days", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": [], "expected_filters": {}, "should_succeed": true}
+{"question": "Items sold by category and country last 6 months", "expected_metric": "items_sold", "expected_grain": null, "expected_dimensions": ["category", "country"], "expected_filters": {}, "should_succeed": true}
+{"question": "Active users by brand last 6 months", "expected_metric": "active_users", "expected_grain": null, "expected_dimensions": ["brand"], "expected_filters": {}, "should_succeed": true}
+{"question": "Orders by brand last 30 days", "expected_metric": "orders", "expected_grain": null, "expected_dimensions": ["brand"], "expected_filters": {}, "should_succeed": true}
+{"question": "Revenue by country for India last 6 months", "expected_metric": "revenue", "expected_grain": null, "expected_dimensions": ["country"], "expected_filters": {"country": ["India"]}, "should_succeed": true}
+{"question": "AOV for France last 30 days", "expected_metric": "aov", "expected_grain": null, "expected_dimensions": [], "expected_filters": {"country": ["France"]}, "should_succeed": true}
+{"question": "Monthly orders for Japan last 6 months", "expected_metric": "orders", "expected_grain": "month", "expected_dimensions": ["date"], "expected_filters": {"country": ["Japan"]}, "should_succeed": true}
+{"question": "Revenue by week by country last 6 months", "expected_metric": "revenue", "expected_grain": "week", "expected_dimensions": ["date", "country"], "expected_filters": {}, "should_succeed": true}
+{"question": "Top 20 countries by active users last 6 months", "expected_metric": "active_users", "expected_grain": null, "expected_dimensions": ["country"], "expected_filters": {}, "should_succeed": true}

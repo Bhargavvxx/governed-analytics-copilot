@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: raw_orders
+      - name: raw_order_items
+      - name: raw_users
+      - name: raw_products
+      - name: raw_sessions

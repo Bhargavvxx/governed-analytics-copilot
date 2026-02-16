@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Test / lint / type-check caches
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/packages/
+dbt/logs/
+dbt/.user.yml
+dbt/profiles.yml
+
+# Great Expectations
+pipelines/quality/great_expectations/uncommitted/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+postgres_data/

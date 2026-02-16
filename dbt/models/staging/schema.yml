@@ -1,0 +1,62 @@
+version: 2
+
+models:
+
+  # ── Staging ────────────────────────────────────────────
+  - name: stg_orders
+    description: "Cleaned raw orders with date_id derived."
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: user_id
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['completed', 'cancelled', 'pending']
+      - name: date_id
+        tests: [not_null]
+
+  - name: stg_order_items
+    description: "Cleaned raw order items with line_total."
+    columns:
+      - name: order_id
+        tests: [not_null]
+      - name: product_id
+        tests: [not_null]
+      - name: quantity
+        tests: [not_null]
+      - name: unit_price
+        tests: [not_null]
+
+  - name: stg_users
+    description: "Cleaned raw users."
+    columns:
+      - name: user_id
+        tests: [unique, not_null]
+      - name: country
+        tests: [not_null]
+      - name: device
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['mobile', 'desktop', 'tablet']
+
+  - name: stg_products
+    description: "Cleaned raw products."
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+      - name: category
+        tests: [not_null]
+      - name: brand
+        tests: [not_null]
+
+  - name: stg_sessions
+    description: "Cleaned raw sessions."
+    columns:
+      - name: session_id
+        tests: [unique, not_null]
+      - name: user_id
+        tests: [not_null]

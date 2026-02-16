@@ -1,0 +1,214 @@
+# ─── Governed Analytics Copilot — Semantic Model ─────────
+# Single source of truth for all approved metrics,
+# dimensions, join paths, and security rules.
+# Every generated SQL query MUST conform to these definitions.
+
+version: 1
+
+# ── Metrics ──────────────────────────────────────────────
+# Each metric has:
+#   name        — canonical identifier used in QuerySpec
+#   description — human-readable business definition
+#   expression  — SQL aggregate expression
+#   base_table  — schema-qualified FROM table  (must be in allowed_tables)
+#   alias       — table alias used in expression and joins
+#   filters     — WHERE clauses always applied (e.g. completed-only)
+#   requires_joins — other tables that must be joined (by short name)
+#   is_derived  — if true, composed from other metrics (no direct SQL)
+
+metrics:
+  - name: revenue
+    description: "Total revenue for COMPLETED orders: SUM(quantity × unit_price)"
+    expression: "SUM(oi.quantity * oi.unit_price)"
+    base_table: marts_marts.fct_order_items
+    alias: oi
+    filters:
+      - "oi.status = 'completed'"
+    requires_joins: []
+
+  - name: orders
+    description: "Count of distinct COMPLETED orders"
+    expression: "COUNT(DISTINCT o.order_id)"
+    base_table: marts_marts.fct_orders
+    alias: o
+    filters:
+      - "o.status = 'completed'"
+    requires_joins: []
+
+  - name: aov
+    description: "Average order value: revenue / orders  (completed only)"
+    expression: "SUM(oi.quantity * oi.unit_price) / NULLIF(COUNT(DISTINCT oi.order_id), 0)"
+    base_table: marts_marts.fct_order_items
+    alias: oi
+    filters:
+      - "oi.status = 'completed'"
+    requires_joins: []
+
+  - name: items_sold
+    description: "Total quantity of items in COMPLETED orders"
+    expression: "SUM(oi.quantity)"
+    base_table: marts_marts.fct_order_items
+    alias: oi
+    filters:
+      - "oi.status = 'completed'"
+    requires_joins: []
+
+  - name: returning_customers
+    description: "Distinct users with 2+ COMPLETED orders in the time window"
+    expression: "COUNT(DISTINCT CASE WHEN uo.user_order_cnt >= 2 THEN o.user_id END)"
+    base_table: marts_marts.fct_orders
+    alias: o
+    filters:
+      - "o.status = 'completed'"
+    requires_joins: []
+    is_complex: true
+    cte: |
+      user_order_counts AS (
+        SELECT user_id, COUNT(*) AS user_order_cnt
+        FROM marts_marts.fct_orders
+        WHERE status = 'completed'
+        GROUP BY user_id
+      )
+
+  - name: active_users
+    description: "Distinct users with ≥1 session in the time window (default last 30 days)"
+    expression: "COUNT(DISTINCT s.user_id)"
+    base_table: raw.raw_sessions
+    alias: s
+    filters: []
+    requires_joins: []
+
+  - name: conversion_proxy
+    description: "orders / active_users  (derived metric — not directly queryable)"
+    expression: null
+    base_table: null
+    alias: null
+    filters: []
+    requires_joins: []
+    is_derived: true
+    components: ["orders", "active_users"]
+
+# ── Dimensions ───────────────────────────────────────────
+# Each dimension has:
+#   name    — canonical identifier
+#   column  — qualified column expression (alias.col)
+#   table   — schema-qualified table the column lives in
+#   alias   — table alias
+#   grains  — (date only) allowed time grains
+
+dimensions:
+  - name: date
+    grains: [day, week, month]
+    column: d.date_day
+    table: marts_marts.dim_date
+    alias: d
+    grain_expressions:
+      day:   "d.date_day"
+      week:  "d.week_start"
+      month: "d.month_start"
+
+  - name: country
+    column: u.country
+    table: marts_marts.dim_users
+    alias: u
+
+  - name: device
+    column: u.device
+    table: marts_marts.dim_users
+    alias: u
+
+  - name: category
+    column: p.category
+    table: marts_marts.dim_products
+    alias: p
+
+  - name: brand
+    column: p.brand
+    table: marts_marts.dim_products
+    alias: p
+
+  - name: order_status
+    column: o.status
+    table: marts_marts.fct_orders
+    alias: o
+
+# ── Join Graph ───────────────────────────────────────────
+# Allowed relationships — the copilot may ONLY use these joins.
+# "left_alias" / "right_alias" match the aliases above.
+
+joins:
+  - left: marts_marts.fct_orders
+    left_alias: o
+    right: marts_marts.dim_users
+    right_alias: u
+    "on": "o.user_id = u.user_id"
+    type: left
+
+  - left: marts_marts.fct_order_items
+    left_alias: oi
+    right: marts_marts.fct_orders
+    right_alias: o
+    "on": "oi.order_id = o.order_id"
+    type: inner
+
+  - left: marts_marts.fct_order_items
+    left_alias: oi
+    right: marts_marts.dim_products
+    right_alias: p
+    "on": "oi.product_id = p.product_id"
+    type: left
+
+  - left: raw.raw_sessions
+    left_alias: s
+    right: marts_marts.dim_users
+    right_alias: u
+    "on": "s.user_id = u.user_id"
+    type: left
+
+  - left: marts_marts.fct_orders
+    left_alias: o
+    right: marts_marts.dim_date
+    right_alias: d
+    "on": "o.date_id = d.date_id"
+    type: left
+
+  - left: marts_marts.fct_order_items
+    left_alias: oi
+    right: marts_marts.dim_date
+    right_alias: d
+    "on": "oi.date_id = d.date_id"
+    type: left
+
+  - left: marts_marts.fct_order_items
+    left_alias: oi
+    right: marts_marts.dim_users
+    right_alias: u
+    "on": "oi.user_id = u.user_id"
+    type: left
+
+  - left: raw.raw_sessions
+    left_alias: s
+    right: marts_marts.dim_date
+    right_alias: d
+    "on": "CAST(s.session_ts AS date) = d.date_day"
+    type: left
+
+# ── Security Rules ───────────────────────────────────────
+security:
+  blocked_columns:
+    - user_id
+    - order_id
+  blocked_schemas:
+    - pg_catalog
+    - information_schema
+  read_only: true
+  max_rows: 200
+
+# ── Allowed Tables ───────────────────────────────────────
+allowed_tables:
+  - marts_marts.fct_orders
+  - marts_marts.fct_order_items
+  - marts_marts.dim_users
+  - marts_marts.dim_products
+  - marts_marts.dim_date
+  - raw.raw_sessions

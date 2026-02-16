@@ -1,0 +1,14 @@
+# profiles.yml.example
+# Copy to ~/.dbt/profiles.yml  OR  keep here and run dbt with --profiles-dir .
+governed_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('POSTGRES_HOST', 'localhost') }}"
+      port: "{{ env_var('POSTGRES_PORT', '5432') | int }}"
+      user: "{{ env_var('POSTGRES_USER', 'copilot') }}"
+      pass: "{{ env_var('POSTGRES_PASSWORD', 'copilot_pw') }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'analytics') }}"
+      schema: marts
+      threads: 4
