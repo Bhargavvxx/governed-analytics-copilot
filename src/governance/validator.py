@@ -5,11 +5,12 @@ Checks performed:
   1. Metric exists in the semantic model
   2. Metric is not a derived/abstract metric that can't be queried directly
   3. Every requested dimension exists
-  4. Every filter key is a valid dimension name
-  5. If 'date' dimension is used, the time_grain must be an allowed grain
-  6. Every dimension table is reachable from the metric's base table via
+  4. Every requested dimension is in the metric's allowed_dimensions list
+  5. Every filter key is a valid dimension name
+  6. If 'date' dimension is used, the time_grain must be an allowed grain
+  7. Every dimension table is reachable from the metric's base table via
      approved join paths
-  7. Filter values are non-empty strings (basic sanity)
+  8. Filter values are non-empty strings (basic sanity)
 """
 from __future__ import annotations
 
@@ -60,6 +61,11 @@ def validate_spec(spec: dict[str, Any], model: SemanticModel | None = None) -> l
             errors.append(
                 f"Unknown dimension '{dim_name}'. "
                 f"Allowed: {', '.join(model.get_dimension_names())}"
+            )
+        elif metric_def.allowed_dimensions and dim_name not in metric_def.allowed_dimensions:
+            errors.append(
+                f"Dimension '{dim_name}' is not allowed for metric '{metric_name}'. "
+                f"Allowed: {', '.join(metric_def.allowed_dimensions)}"
             )
 
     filters: dict[str, list[str]] = spec.get("filters") or {}

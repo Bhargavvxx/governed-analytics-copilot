@@ -34,6 +34,7 @@ class Metric:
     is_complex: bool = False
     components: list[str] = field(default_factory=list)
     cte: str | None = None
+    allowed_dimensions: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -196,6 +197,7 @@ def _parse_metric(raw: dict[str, Any]) -> Metric:
         is_complex=raw.get("is_complex", False),
         components=raw.get("components") or [],
         cte=raw.get("cte"),
+        allowed_dimensions=raw.get("allowed_dimensions") or [],
     )
 
 

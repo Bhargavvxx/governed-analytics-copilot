@@ -120,6 +120,24 @@ def test_reachable_category_from_revenue(model):
     assert errors == []
 
 
+def test_dimension_not_allowed_for_metric(model):
+    """active_users (sessions) cannot be broken down by category (products)."""
+    errors = validate_spec(
+        _valid_spec(metric="active_users", dimensions=["category"]),
+        model,
+    )
+    assert any("not allowed" in e.lower() and "category" in e for e in errors)
+
+
+def test_dimension_allowed_for_metric(model):
+    """active_users can be broken down by country (dim_users is reachable from sessions)."""
+    errors = validate_spec(
+        _valid_spec(metric="active_users", dimensions=["country"]),
+        model,
+    )
+    assert errors == []
+
+
 
 def test_empty_string_filter_value(model):
     errors = validate_spec(

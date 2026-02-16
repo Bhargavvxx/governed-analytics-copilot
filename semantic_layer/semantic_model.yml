@@ -15,6 +15,7 @@ version: 1
 #   filters     — WHERE clauses always applied (e.g. completed-only)
 #   requires_joins — other tables that must be joined (by short name)
 #   is_derived  — if true, composed from other metrics (no direct SQL)
+#   allowed_dimensions — which dimensions this metric may be broken down by
 
 metrics:
   - name: revenue
@@ -25,6 +26,7 @@ metrics:
     filters:
       - "oi.status = 'completed'"
     requires_joins: []
+    allowed_dimensions: [date, country, device, category, brand, order_status]
 
   - name: orders
     description: "Count of distinct COMPLETED orders"
@@ -34,6 +36,7 @@ metrics:
     filters:
       - "o.status = 'completed'"
     requires_joins: []
+    allowed_dimensions: [date, country, device, category, brand, order_status]
 
   - name: aov
     description: "Average order value: revenue / orders  (completed only)"
@@ -43,6 +46,7 @@ metrics:
     filters:
       - "oi.status = 'completed'"
     requires_joins: []
+    allowed_dimensions: [date, country, device, category, brand, order_status]
 
   - name: items_sold
     description: "Total quantity of items in COMPLETED orders"
@@ -52,6 +56,7 @@ metrics:
     filters:
       - "oi.status = 'completed'"
     requires_joins: []
+    allowed_dimensions: [date, country, device, category, brand, order_status]
 
   - name: returning_customers
     description: "Distinct users with 2+ COMPLETED orders in the time window"
@@ -61,6 +66,7 @@ metrics:
     filters:
       - "o.status = 'completed'"
     requires_joins: []
+    allowed_dimensions: [date, country, device, order_status]
     is_complex: true
     cte: |
       user_order_counts AS (
@@ -71,12 +77,13 @@ metrics:
       )
 
   - name: active_users
-    description: "Distinct users with ≥1 session in the time window (default last 30 days)"
+    description: "Distinct users with >=1 session in the time window (default last 30 days)"
     expression: "COUNT(DISTINCT s.user_id)"
     base_table: raw.raw_sessions
     alias: s
     filters: []
     requires_joins: []
+    allowed_dimensions: [date, country, device]
 
   - name: conversion_proxy
     description: "orders / active_users  (derived metric -- not directly queryable, query its components instead)"
@@ -85,6 +92,7 @@ metrics:
     alias: null
     filters: []
     requires_joins: []
+    allowed_dimensions: []
     is_derived: true
     components: ["orders", "active_users"]
 

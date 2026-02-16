@@ -25,6 +25,7 @@ _METRIC_KEYWORDS: dict[str, list[str]] = {
     "items_sold":           ["items sold", "items", "quantity", "units sold", "units"],
     "returning_customers":  ["returning", "repeat", "loyal"],
     "active_users":         ["active users", "active", "active sessions", "dau", "mau"],
+    "conversion_proxy":     ["conversion proxy", "conversion rate", "conversion"],
 }
 
 _DIMENSION_KEYWORDS: dict[str, list[str]] = {
