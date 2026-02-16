@@ -16,6 +16,8 @@ class MetricItem(BaseModel):
     name: str
     description: str
     is_derived: bool
+    queryable: bool
+    allowed_dimensions: list[str]
 
 
 class DimensionItem(BaseModel):
@@ -41,12 +43,17 @@ def list_metrics() -> dict:
 
 @router.get("/metrics/detail", response_model=list[MetricItem])
 def list_metrics_detail() -> list[MetricItem]:
-    """Return enriched metadata for queryable (non-derived) metrics."""
+    """Return enriched metadata for all metrics (derived flagged as not queryable)."""
     model = load_semantic_model()
     return [
-        MetricItem(name=m.name, description=m.description, is_derived=m.is_derived)
+        MetricItem(
+            name=m.name,
+            description=m.description,
+            is_derived=m.is_derived,
+            queryable=not m.is_derived,
+            allowed_dimensions=m.allowed_dimensions,
+        )
         for m in model.metrics.values()
-        if not m.is_derived
     ]
 
 
@@ -73,9 +80,14 @@ def full_catalog() -> CatalogResponse:
     model = load_semantic_model()
     return CatalogResponse(
         metrics=[
-            MetricItem(name=m.name, description=m.description, is_derived=m.is_derived)
+            MetricItem(
+                name=m.name,
+                description=m.description,
+                is_derived=m.is_derived,
+                queryable=not m.is_derived,
+                allowed_dimensions=m.allowed_dimensions,
+            )
             for m in model.metrics.values()
-            if not m.is_derived
         ],
         dimensions=[
             DimensionItem(name=d.name, column=d.column, grains=d.grains)

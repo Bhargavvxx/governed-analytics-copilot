@@ -44,10 +44,18 @@ def test_metrics_detail():
     assert isinstance(items, list)
     names = [m["name"] for m in items]
     assert "revenue" in names
+    assert "conversion_proxy" in names  # detail shows all including derived
     # Check structure
     revenue = next(m for m in items if m["name"] == "revenue")
     assert "description" in revenue
     assert revenue["is_derived"] is False
+    assert revenue["queryable"] is True
+    assert "country" in revenue["allowed_dimensions"]
+    # Derived metric
+    cp = next(m for m in items if m["name"] == "conversion_proxy")
+    assert cp["is_derived"] is True
+    assert cp["queryable"] is False
+    assert cp["allowed_dimensions"] == []
 
 
 def test_dimensions_detail():
@@ -71,6 +79,18 @@ def test_full_catalog():
     assert "max_rows" in data
     assert data["max_rows"] == 200
     assert len(data["allowed_tables"]) == 6
+    # Catalog now includes all metrics (queryable + derived)
+    metric_names = [m["name"] for m in data["metrics"]]
+    assert "revenue" in metric_names
+    assert "conversion_proxy" in metric_names
+    # Each metric has allowed_dimensions and queryable
+    revenue = next(m for m in data["metrics"] if m["name"] == "revenue")
+    assert revenue["queryable"] is True
+    assert len(revenue["allowed_dimensions"]) > 0
+    # active_users should NOT have category
+    au = next(m for m in data["metrics"] if m["name"] == "active_users")
+    assert "category" not in au["allowed_dimensions"]
+    assert "country" in au["allowed_dimensions"]
 
 
 

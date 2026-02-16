@@ -31,6 +31,8 @@ The SQL safety layer enforces these rules on every generated query:
 
 All rules are defined in [semantic_layer/semantic_model.yml](semantic_layer/semantic_model.yml) and enforced in `src/governance/sql_safety.py`.
 
+Derived metrics (e.g., `conversion_proxy`) are defined in the semantic layer for documentation but are not directly queryable. The validator blocks them and suggests querying their component metrics instead.
+
 ---
 
 ## Quick start
@@ -132,7 +134,7 @@ LIMIT 200
 | API | FastAPI + Uvicorn |
 | UI | Streamlit |
 | LLM | Provider-agnostic (mock / OpenAI / Anthropic) |
-| Testing | pytest (184 tests) |
+| Testing | pytest (190 tests) |
 
 ## Project structure
 
@@ -151,7 +153,7 @@ governed-analytics-copilot/
 |   +-- api/                 FastAPI (/ask, /catalog, /health)
 |   +-- ui/                  Streamlit (Ask + History pages)
 +-- analytics/               eval harness (50 questions) + reports
-+-- tests/                   184 unit + integration tests
++-- tests/                   190 unit + integration tests
 ```
 
 ## License

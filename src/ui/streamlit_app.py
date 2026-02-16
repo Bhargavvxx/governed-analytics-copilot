@@ -60,9 +60,12 @@ with st.sidebar:
         for m in catalog.get("metrics", []):
             label = f"**{m['name']}**"
             if m.get("is_derived"):
-                label += " _(derived)_"
+                label += " _(derived -- not queryable)_"
             st.markdown(f"- {label}")
             st.caption(f"  {m.get('description', '')}")
+            dims = m.get("allowed_dimensions", [])
+            if dims:
+                st.caption(f"  Allowed breakdowns: {', '.join(dims)}")
 
         st.divider()
 
