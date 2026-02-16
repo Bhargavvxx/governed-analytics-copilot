@@ -20,6 +20,7 @@ def test_loads_without_error():
 
 
 def test_metric_names_loaded():
+    """get_metric_names() returns only queryable (non-derived) metrics."""
     names = get_metric_names()
     assert "revenue" in names
     assert "aov" in names
@@ -27,8 +28,8 @@ def test_metric_names_loaded():
     assert "items_sold" in names
     assert "active_users" in names
     assert "returning_customers" in names
-    assert "conversion_proxy" in names
-    assert len(names) == 7
+    assert "conversion_proxy" not in names  # derived -- excluded
+    assert len(names) == 6
 
 
 def test_dimension_names_loaded():

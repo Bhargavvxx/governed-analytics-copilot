@@ -34,18 +34,19 @@ class CatalogResponse(BaseModel):
 
 @router.get("/metrics")
 def list_metrics() -> dict:
-    """Return all metric names (lightweight)."""
+    """Return queryable (non-derived) metric names."""
     model = load_semantic_model()
     return {"metrics": model.get_metric_names()}
 
 
 @router.get("/metrics/detail", response_model=list[MetricItem])
 def list_metrics_detail() -> list[MetricItem]:
-    """Return enriched metric metadata."""
+    """Return enriched metadata for queryable (non-derived) metrics."""
     model = load_semantic_model()
     return [
         MetricItem(name=m.name, description=m.description, is_derived=m.is_derived)
         for m in model.metrics.values()
+        if not m.is_derived
     ]
 
 
@@ -74,6 +75,7 @@ def full_catalog() -> CatalogResponse:
         metrics=[
             MetricItem(name=m.name, description=m.description, is_derived=m.is_derived)
             for m in model.metrics.values()
+            if not m.is_derived
         ],
         dimensions=[
             DimensionItem(name=d.name, column=d.column, grains=d.grains)

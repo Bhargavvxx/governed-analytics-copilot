@@ -23,7 +23,8 @@ def test_metrics_list():
     data = resp.json()
     assert "metrics" in data
     assert "revenue" in data["metrics"]
-    assert len(data["metrics"]) == 7
+    assert "conversion_proxy" not in data["metrics"]  # derived -- excluded
+    assert len(data["metrics"]) == 6
 
 
 def test_dimensions_list():

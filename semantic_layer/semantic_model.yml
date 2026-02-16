@@ -79,7 +79,7 @@ metrics:
     requires_joins: []
 
   - name: conversion_proxy
-    description: "orders / active_users  (derived metric — not directly queryable)"
+    description: "orders / active_users  (derived metric -- not directly queryable, query its components instead)"
     expression: null
     base_table: null
     alias: null

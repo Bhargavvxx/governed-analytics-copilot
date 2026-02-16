@@ -83,15 +83,22 @@ class SemanticModel:
         return self.dimensions.get(name)
 
     def get_metric_names(self) -> list[str]:
+        """Return only queryable (non-derived) metric names."""
+        return [n for n, m in self.metrics.items() if not m.is_derived]
+
+    def get_all_metric_names(self) -> list[str]:
+        """Return every metric name including derived ones."""
         return list(self.metrics.keys())
 
     def get_dimension_names(self) -> list[str]:
         return list(self.dimensions.keys())
 
     def get_metrics_list(self) -> list[dict[str, Any]]:
-        """Return metrics as a list of dicts (for API responses)."""
+        """Return queryable (non-derived) metrics as a list of dicts."""
         result = []
         for m in self.metrics.values():
+            if m.is_derived:
+                continue
             result.append({
                 "name": m.name,
                 "description": m.description,
