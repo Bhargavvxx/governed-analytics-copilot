@@ -8,7 +8,7 @@ Checks performed:
   1. SQL must be a single SELECT statement (no DDL / DML / multi-statement)
   2. No SELECT *
   3. No blocked schemas (pg_catalog, information_schema ...)
-  4. No blocked columns (user_id, order_id ...)
+  4. No blocked columns in SELECT -- except inside COUNT()
   5. Only allowed tables may appear
   6. LIMIT must be present and ≤ max_rows
   7. No dangerous keywords (DROP, ALTER, TRUNCATE, INSERT, UPDATE, DELETE, GRANT ...)
@@ -89,9 +89,11 @@ def check_sql_safety(
         if f"{schema}." in sql_lower:
             errors.append(f"Blocked schema referenced: '{schema}'.")
 
-    # Only check in SELECT projection (before FROM)
-    # Columns inside aggregate functions (COUNT, SUM, ...) are safe -- the raw
-    # value is never exposed to the user.
+    # Only check in SELECT projection (before FROM).
+    # COUNT / COUNT(DISTINCT ...) never expose raw values, so blocked columns
+    # inside COUNT are safe.  All other aggregates (SUM, AVG, MIN, MAX,
+    # STRING_AGG, ARRAY_AGG, ...) CAN leak individual values, so blocked
+    # columns inside those must still be flagged.
     select_section = sql_stripped
     from_idx = sql_lower.find("\nfrom ")
     if from_idx == -1:
@@ -99,9 +101,9 @@ def check_sql_safety(
     if from_idx != -1:
         select_section = sql_stripped[:from_idx]
 
-    # Strip aggregate function contents before checking
-    _agg_re = re.compile(r"\b(COUNT|SUM|AVG|MIN|MAX)\s*\([^)]*\)", re.IGNORECASE)
-    select_cleaned = _agg_re.sub("__agg__", select_section)
+    # Strip only COUNT(...) contents -- those are safe for blocked columns.
+    _count_re = re.compile(r"\bCOUNT\s*\([^)]*\)", re.IGNORECASE)
+    select_cleaned = _count_re.sub("__agg__", select_section)
 
     for col in model.security.blocked_columns:
         # Must be a standalone reference: alias.col or just col as output name

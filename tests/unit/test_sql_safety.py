@@ -111,8 +111,8 @@ def test_blocked_column_in_join_on_is_ok(model):
     assert errors == []
 
 
-def test_blocked_column_inside_aggregate_is_ok(model):
-    """Blocked columns inside COUNT/SUM/... are not exposed as raw values."""
+def test_blocked_column_inside_count_is_ok(model):
+    """Blocked columns inside COUNT/COUNT(DISTINCT) are safe -- no raw values exposed."""
     sql = (
         "SELECT COUNT(DISTINCT o.order_id) AS orders\n"
         "FROM marts_marts.fct_orders AS o\n"
@@ -122,14 +122,37 @@ def test_blocked_column_inside_aggregate_is_ok(model):
     assert not any("order_id" in e for e in errors)
 
 
-def test_blocked_column_inside_sum_is_ok(model):
+def test_blocked_column_inside_sum_is_blocked(model):
+    """SUM on a blocked column can leak individual values -- must be blocked."""
     sql = (
         "SELECT SUM(o.user_id) AS uid_sum\n"
         "FROM marts_marts.fct_orders AS o\n"
         "LIMIT 10"
     )
     errors = check_sql_safety(sql, model)
-    assert not any("user_id" in e for e in errors)
+    assert any("user_id" in e for e in errors)
+
+
+def test_blocked_column_inside_min_blocked(model):
+    """MIN on a blocked column reveals a real ID."""
+    sql = (
+        "SELECT MIN(o.user_id) AS first_uid\n"
+        "FROM marts_marts.fct_orders AS o\n"
+        "LIMIT 10"
+    )
+    errors = check_sql_safety(sql, model)
+    assert any("user_id" in e for e in errors)
+
+
+def test_blocked_column_inside_max_blocked(model):
+    """MAX on a blocked column reveals a real ID."""
+    sql = (
+        "SELECT MAX(o.order_id) AS last_order\n"
+        "FROM marts_marts.fct_orders AS o\n"
+        "LIMIT 10"
+    )
+    errors = check_sql_safety(sql, model)
+    assert any("order_id" in e for e in errors)
 
 
 
