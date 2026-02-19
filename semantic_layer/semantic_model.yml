@@ -220,3 +220,21 @@ allowed_tables:
   - marts_marts.dim_products
   - marts_marts.dim_date
   - raw.raw_sessions
+
+# ── Role-Based Access Control (RBAC) ────────────────────
+# Each role defines which metrics and dimensions its members may query.
+# Use "*" to grant access to everything. Omit the roles section (or leave
+# it empty) to operate in open mode (no RBAC enforcement).
+roles:
+  finance:
+    allowed_metrics: [revenue, aov, orders, items_sold]
+    allowed_dimensions: [date, country, category, brand, order_status]
+  marketing:
+    allowed_metrics: [active_users, orders, revenue]
+    allowed_dimensions: [date, country, device]
+  analyst:
+    allowed_metrics: "*"
+    allowed_dimensions: "*"
+  viewer:
+    allowed_metrics: [revenue, orders]
+    allowed_dimensions: [date, country]

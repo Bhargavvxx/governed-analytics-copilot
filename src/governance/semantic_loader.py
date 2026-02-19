@@ -17,6 +17,8 @@ from typing import Any
 
 import yaml
 
+from src.governance.rbac import Role, parse_roles
+
 _SEMANTIC_PATH = Path(__file__).resolve().parents[2] / "semantic_layer" / "semantic_model.yml"
 
 
@@ -75,6 +77,7 @@ class SemanticModel:
     joins: list[JoinEdge]
     security: SecurityRules
     allowed_tables: set[str]
+    roles: dict[str, Role] = field(default_factory=dict)  # RBAC roles
 
 
     def metric(self, name: str) -> Metric | None:
@@ -240,6 +243,7 @@ def _parse_model(raw_yaml: dict[str, Any]) -> SemanticModel:
     joins = [_parse_join(j) for j in raw_yaml.get("joins", [])]
     security = _parse_security(raw_yaml.get("security"))
     allowed = set(raw_yaml.get("allowed_tables", []))
+    roles = parse_roles(raw_yaml.get("roles"))
     return SemanticModel(
         version=raw_yaml.get("version", 1),
         metrics=metrics,
@@ -247,6 +251,7 @@ def _parse_model(raw_yaml: dict[str, Any]) -> SemanticModel:
         joins=joins,
         security=security,
         allowed_tables=allowed,
+        roles=roles,
     )
 
 

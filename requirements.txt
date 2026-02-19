@@ -1,0 +1,41 @@
+# ─── Governed Analytics Copilot — Requirements ────────────
+# Generated from pyproject.toml + installed versions.
+# Install:  pip install -r requirements.txt
+
+# ── Web / API ─────────────────────────────────────────────
+fastapi>=0.110,<1
+uvicorn[standard]>=0.29,<1
+pydantic>=2,<3
+pydantic-settings>=2,<3
+
+# ── Database ──────────────────────────────────────────────
+sqlalchemy>=2,<3
+psycopg2-binary>=2.9,<3
+
+# ── dbt ───────────────────────────────────────────────────
+dbt-core>=1.7,<2
+dbt-postgres>=1.7,<2
+
+# ── Data quality ──────────────────────────────────────────
+great-expectations>=0.18,<1
+
+# ── UI ────────────────────────────────────────────────────
+streamlit>=1.32,<2
+
+# ── LLM (optional — only needed for openai/anthropic mode)
+openai>=1.12,<2
+anthropic>=0.21,<1
+
+# ── Utilities ─────────────────────────────────────────────
+python-dotenv>=1,<2
+pyyaml>=6,<7
+httpx>=0.27,<1
+sqlparse>=0.5,<1
+tabulate>=0.9,<1
+Faker>=24,<30
+
+# ── Dev / Testing ─────────────────────────────────────────
+pytest>=8,<9
+pytest-asyncio>=0.23,<1
+ruff>=0.3,<1
+pre-commit>=3,<4
