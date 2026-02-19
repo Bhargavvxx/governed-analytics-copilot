@@ -17,10 +17,9 @@ import streamlit as st
 import httpx
 import pandas as pd
 import json
-import os
 
 
-API_BASE = os.getenv("API_URL", "http://localhost:8000")
+API_BASE = "http://localhost:8000"
 _TIMEOUT = 30
 
 st.set_page_config(
